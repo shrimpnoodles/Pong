@@ -17,7 +17,10 @@
 #include "simAVRHeader.h"
 #endif
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> ed1ef87c8f15dd5465832250c3d4bb7907d6e81f
 //unsigned char pattern = 0x80;
 //unsigned char row = 0xFE;
 
