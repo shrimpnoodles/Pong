@@ -10,13 +10,16 @@
 #include <avr/io.h>
 #include <timer.h>
 #include <stdlib.h>
+#include <stdio.h>
+#include <time.h>
 #include <scheduler.h>
 #ifdef _SIMULATE_
 #include "simAVRHeader.h"
 #endif
 
-unsigned char pattern = 0x80;
-unsigned char row = 0xFE;
+
+//unsigned char pattern = 0x80;
+//unsigned char row = 0xFE;
 
 void Set_A2D_Pin(unsigned char pinNum) {
 	ADMUX = (pinNum <= 0x07) ? pinNum : ADMUX;
@@ -40,6 +43,7 @@ unsigned char enemypattern;
 
 unsigned char userpaddle_pos;
 unsigned char enemypos;
+unsigned char sensor;
 
 unsigned char enemyrand;
 
@@ -157,32 +161,160 @@ int userpaddle_Tick(int state){
 
 //skeleton of enemy paddle
 //
-enum enemypaddle_States{start2, init2, nomove2, up2, down2};
+enum enemypaddle_States{start2, init2, pos1, pos2, pos3, pos4, pos5, pos6, waitenemy };
 
 int enemypaddle_Tick(int state){
 	switch(state){
 		case start2:
-			if(!p2on){
-				state = init2;
-			}
+			//p2 button off conditions
+			state = init2;
 			break;
 		case init2:
-			state = nomove2;
-			break;
-		case nomove2:
-			if(ballrow <= 0xe3 && ballpattern == 0x08){
-				state = down2;
-			}
-			else if(ballrow > 0xe3 && ballpattern == 0x08){
-				state =up2;
-			}
+			
 
+			if(enemypos ==1){
+				state = pos1;
+			}
+			else if(enemypos ==2){
+				state = pos2;
+			}
+			else if(enemypos == 3){
+				state = pos3;
+			}
+			else if(enemypos == 4){
+				state = pos4;
+			}
+			else if(enemypos == 5){
+				state = pos5;
+			}
+			else if(enemypos == 6){
+				state = pos6;
+			}
 			break;
-		case up2:
-			state = nomove2;
+		case pos1:
+		/*	if(enemypos ==2){
+				state = pos2;
+			}
+			else if(enemypos == 3){
+				state = pos3;
+			}
+			else if(enemypos == 4){
+				state = pos4;
+			}
+			else if(enemypos == 5){
+				state = pos5;
+			}
+			else if(enemypos == 6){
+			       state = pos6;
+			}*/
+			if(sensor ==1){
+				state = waitenemy;
+			}	
+	 		break;		
+		case pos2:
+		/*	if(enemypos ==1){
+				state = pos1;
+			}
+			else if(enemypos ==3){
+				state = pos3;
+			}
+			else if(enemypos ==4){
+				state = pos4;
+			}
+			else if(enemypos == 5){
+				state = pos5;
+			}
+			else if(enemypos ==6){
+				state = pos6;
+			}*/
+			if(sensor ==1){
+				state = waitenemy;
+			}
 			break;
-		case down2:
-			state = nomove2;
+		case pos3:
+		/*	if(enemypos == 1){
+				state = pos1;
+			}
+			else if(enemypos == 2){
+				state = pos2;
+			}
+			else if(enemypos ==4){
+				state = pos4;
+			}
+			else if(enemypos == 5){
+				state = pos5;
+			}
+			else if(enemypos ==6){
+				state = pos6;
+			}*/
+			if(sensor ==1){
+				state = waitenemy;
+			}
+			break;
+		case pos4:
+		/*	if(enemypos ==1){
+				state = pos1;
+			}
+			else if(enemypos ==2){
+				state = pos2;
+			}
+			else if(enemypos == 3){
+				state = pos3;
+			}
+			else if(enemypos == 5){
+				state = pos5;
+			}
+			else if(enemypos == 6){
+				state = pos6;
+			}*/
+			if(sensor ==1){
+				state = waitenemy;
+			}
+			break;
+		case pos5:
+		/*	if(enemypos ==1){
+				state = pos1;
+			}
+			else if(enemypos ==2){
+				state = pos2;
+			}
+			else if(enemypos == 3){
+				state = pos3;
+			}
+			else if(enemypos == 4){
+				state = pos4;
+			}
+			else if(enemypos == 6){
+				state = pos6;
+			}*/
+			if(sensor==1){
+				state = waitenemy;
+			}
+			break;
+		case pos6:
+		/*	if(enemypos ==1){
+				state = pos1;
+			}
+			else if(enemypos ==2){
+				state = pos2;
+			}
+			else if(enemypos == 3){
+				state = pos3;
+			}
+			else if(enemypos == 4){
+				state = pos4;
+			}
+			else if(enemypos == 5){
+				state = pos5;
+			}*/
+			if(sensor==1){
+				state = waitenemy;
+			}
+			break;
+		case waitenemy:
+			if(sensor==0){
+				state = init2;
+			}
 			break;
 		default:
 			state = start2;
@@ -190,158 +322,234 @@ int enemypaddle_Tick(int state){
 	}
 	switch(state){
 		case start2:
-			break;
-		case init2:
+			//p2 condition?
+			
+			sensor =0;
+			enemypos =3;
 			enemyrow = 0xc7;
 			enemypattern = 0x01;
-			enemypos =3;
 			break;
-		case nomove2:
+		case init2:
+			//any conditions?
 			break;
-		case up2:
-			enemyrand = (rand() % (4-1+1))+1;
+		case pos1:
+			if(ballpattern <= 0x04 && ballrow >0xf7){
+				enemyrand = (rand()%(3+1-1))+1;
 
-			if(enemyrand ==1){
-				//do not move
-			}
-			else if(enemyrand == 2){//1 up
-				if(enemyrow == 0xf8){
+				if(enemyrand == 1){
+					enemypos =1;
 					enemyrow = 0xf1;
-					enemypos = 5;
+					//add variable for hit?
 				}
-				else if(enemyrow == 0xf1){
-					enemyrow = 0xe3;
-					enemypos = 4;
-				}
-				else if(enemyrow == 0xe3){
-					enemyrow = 0xc7;
-					enemypos =3;
-				}
-				else if(enemyrow == 0xc7){
-					enemyrow = 0x8f;
+				else if(enemyrand ==2){
 					enemypos = 2;
-				}
-				else if(enemyrow == 0x8f){
-					enemyrow = 0x1f;
-					enemypos =1;
-				}
-			}
-			else if(enemyrand == 3){
-				if(enemyrow == 0xf8){//2 up
-					enemyrow = 0xe3;
-					enemypos = 4;
-				}
-				else if(enemyrow == 0xf1){
-					enemyrow = 0xc7;
-					enemypos =3;
-				}
-				else if(enemyrow == 0xe3){
 					enemyrow = 0x8f;
-					enemypos = 2;
 				}
-				else if(enemyrow == 0xc7){
-					enemyrow = 0xf1;
-					enemypos =1;
-				}
-				else if(enemyrow == 0x8f){
-					enemyrow = 0xf1;
-					enemypos =1;
-				}
-			}
-			else if(enemyrand == 4){ //1 down
-				if(enemyrow == 0x1f){
-					enemyrow = 0x8f;
-					enemypos =2;
-				}
-				else if(enemyrow == 0x8f){
-					enemyrow = 0xc7;
+				else if(enemyrand == 3){
 					enemypos =3;
-				}
-				else if(enemyrow == 0xc7){
-					enemyrow = 0xe3;
-					enemypos = 4;
-				}
-				else if(enemyrow == 0xe3){
-					enemyrow = 0xf1;
-					enemypos = 5;
-				}
-				else if(enemyrow == 0xf1){
-					enemyrow = 0xf8;
-					enemypos = 6;
+					enemyrow = 0xc7;
 				}
 			}
-			break;
-		case down2:
-			enemyrand = (rand() % (4-1+1))+1;
+			else if(ballpattern <=0x04 && ballrow <= 0xf7){
+				enemyrand = (rand()%(4+1-1))+1;
 
-			if(enemyrand ==1){
-				//do not move
-			}
-			else if(enemyrand == 2){//1 up
-				if(enemyrow == 0xf8){
-					enemyrow = 0xf1;
-					enemypos = 5;
-				}
-				else if(enemyrow == 0xf1){
-					enemyrow = 0xe3;
-					enemypos = 4;
-				}
-				else if(enemyrow == 0xe3){
-					enemyrow = 0xc7;
-					enemypos =3;
-				}
-				else if(enemyrow == 0xc7){
-					enemyrow = 0x8f;
-					enemypos = 2;
-				}
-				else if(enemyrow == 0x8f){
-					enemyrow = 0x1f;
-					enemypos =1;
-				}
-			}
-			else if(enemyrand == 3){
-				if(enemyrow == 0xf1){//2 down
-					enemyrow = 0xc7;
+				if(enemyrand ==1){
 					enemypos = 3;
+					enemyrow = 0xc7;
 				}
-				else if(enemyrow == 0x8f){
-					enemyrow = 0xe3;
+				else if(enemyrand ==2){
 					enemypos = 4;
+					enemyrow = 0xe3;
 				}
-				else if(enemyrow == 0xc7){
-					enemyrow = 0xf1;
+				else if(enemyrand == 3){
 					enemypos = 5;
+					enemyrow = 0xf1;
 				}
-				else if(enemyrow == 0xe3){
-					enemyrow = 0xf8;
+				else if(enemyrand == 4){
 					enemypos = 6;
-				}
-				else if(enemyrow ==0xf1){
 					enemyrow = 0xf8;
-					enemypos = 6;
 				}
 			}
-			else if(enemyrand == 4){ //1 down
-				if(enemyrow == 0x1f){
-					enemyrow = 0x8f;
+			sensor =1;
+			break;
+		case pos2:
+			if(ballpattern <=0x04 && ballrow > 0xf7){
+				enemyrand = (rand() % (2+1-1))+1;
+				
+				if(enemyrand == 1){
+					enemypos =1;
+					enemyrow = 0x1f;
+				}
+				else if(enemyrand ==2){
 					enemypos =2;
+					enemyrow = 0x8f;
 				}
-				else if(enemyrow == 0x8f){
+			}
+			else if( ballpattern <= 0x04 && ballrow <= 0xf7){
+			       enemyrand = (rand() % (4+1-1))+1;
+
+				if(enemyrand == 1){
+			 		enemypos =3;
 					enemyrow = 0xc7;
-					enemypos =3;
 				}
-				else if(enemyrow == 0xc7){
-					enemyrow = 0xe3;
+				else if(enemyrand == 2){
 					enemypos = 4;
+					enemyrow = 0xe3;
 				}
-				else if(enemyrow == 0xe3){
-					enemyrow = 0xf1;
+				else if(enemyrand == 3){
 					enemypos = 5;
+					enemyrow = 0xf1;
 				}
-				else if(enemyrow == 0xf1){
+				else if(enemyrand == 4){
+					enemypos =6;
 					enemyrow = 0xf8;
-					enemypos = 6;
 				}
+			}
+			sensor =1;
+			break;		
+		case pos3:
+			if(ballpattern <= 0x04 && ballrow > 0xf7){
+				enemyrand = (rand() % (3+1-1))+1;
+
+				if(enemyrand ==1){
+					enemypos = 2;
+					enemyrow = 0x8f;
+				}
+				else if(enemyrand == 2){
+					enemypos =1;
+					enemyrow = 0x1f;
+				}
+				else if(enemyrand ==3){
+					enemypos =3;
+					enemyrow = 0xc7;
+				}
+			}
+			else if(ballpattern <= 0x04 && ballrow <= 0xf7){
+				enemyrand = (rand() % (4+1-1))+1;
+
+				if(enemyrand ==1){
+					enemypos =3;
+					enemyrow = 0xc7;
+				}
+				else if(enemyrand ==2){
+					enemypos = 4;
+					enemyrow = 0xe3;
+				}
+				else if(enemyrand == 3){
+					enemypos =5;
+					enemyrow = 0xf1;
+				}
+				else if(enemyrand == 4){
+					enemypos =6;
+					enemyrow = 0xf8;
+				}
+			}
+			sensor =1;
+			break;
+		case pos4:
+			if(ballpattern <=0x04 && ballrow > 0xf7){
+				enemyrand = (rand() % (3+1-1))+1;
+
+				if(enemyrand == 1){
+					enemypos =3;
+					enemyrow = 0xc7;
+				}
+				else if(enemyrand ==2){
+					enemypos = 2;
+					enemyrow = 0x8f;
+				}
+				else if(enemyrand == 3){
+					enemypos =1;
+					enemyrow = 0x1f;
+				}
+			}
+			else if(ballpattern <=0x04 && ballrow <= 0xf7){
+				enemyrand = (rand() % (3+1-1))+1;
+
+				if(enemyrand == 1){
+					enemypos = 4;
+					enemyrow = 0xe3;
+				}
+				else if(enemyrand == 2){
+					enemypos = 5;
+					enemyrow = 0xf1;
+				}
+				else if(enemyrand ==3 ){
+					enemypos = 6;
+					enemyrow =0xf8;
+				}
+			}
+			sensor =1;
+			break;
+		case pos5:
+			if(ballpattern <= 0x04 && ballrow > 0xf7){
+				enemyrand = (rand() % (4+1-1))+1;
+
+				if(enemyrand == 1){
+					enemypos = 4;
+					enemyrow = 0xe3;
+				}
+				else if(enemyrand == 2){
+					enemypos = 3;
+					enemyrow = 0xc7;
+				}
+				else if(enemyrand ==3){
+					enemypos = 2;
+					enemyrow = 0x8f;
+				}
+				else if(enemyrand == 4){
+					enemypos = 1;
+					enemyrow = 0x1f;
+				}
+			}
+			else if(ballpattern <=0x04 && ballrow <= 0xf7){
+				enemyrand = (rand() % (2+1-1))+1;
+
+				if(enemyrand == 1){
+					enemypos =5;
+					enemyrow = 0xf1;
+				}
+				else if(enemyrand == 2){
+					enemypos = 6;
+					enemyrow = 0xf8;
+				}
+			}
+			sensor =1;
+			break;
+		case pos6:
+			if(ballrow <= 0x04 && ballpattern > 0xf7){
+				enemyrand = (rand() % (3+1-1))+1;
+
+				if(enemyrand ==1){
+					enemypos =3;
+					enemyrow = 0xc7;
+				}
+				else if(enemyrand == 2){
+					enemypos = 2;
+					enemyrow = 0x8f;
+				}
+				else if(enemyrand == 3){
+					enemypos = 1;
+					enemyrow = 0x1f;
+				}
+			}
+			else if(ballrow <= 0x04 && ballpattern <=0xf7){
+				enemyrand = (rand() % (2+1-1))+1;
+
+				if(enemyrand ==1){
+					enemypos =6;
+					enemyrow = 0xf8;
+				}
+				else if(enemyrand ==2){
+					enemypos = 5;
+					enemyrow = 0xf1;
+				}
+			}
+			sensor =1;
+			break;
+		case waitenemy:
+			if(temp_ballpattern ==0x02){
+				sensor =0;
 			}
 			break;
 		default:
@@ -473,12 +681,12 @@ int ballmovements_Tick(int state){
 		}
 		break;
 	case ballup:
-		if(ballrow == 0x7f && ballpattern!=0x02){
+		if(ballrow == 0xfe){// && ballpattern!=0x02){
 			state = balldown;
 		}
-		else if(ballrow == 0x7f && ballpattern != 0x40){
-			state = balldown;
-		}
+	//	else if(ballrow == 0x7f && ballpattern != 0x40){
+	//		state = balldown;
+	//	}
 		else if(temp_ballpattern == 0x02 && ballpattern == 0x40){
 			state = init3;
 		}
@@ -487,12 +695,12 @@ int ballmovements_Tick(int state){
 		}
 		break;
 	case balldown:
-		if(ballrow == 0xfe && ballpattern != 0x02){
+		if(ballrow == 0x7f){// && ballpattern != 0x02){
 			state = ballup;
 		}
-		else if(ballrow == 0xfe && ballpattern != 0x40){
-			state = ballup;
-		}
+	//	else if(ballrow == 0xfe && ballpattern != 0x40){
+	//		state = ballup;
+	//	}
 		else if (temp_ballpattern == 0x02 && ballpattern == 0x40){
 			state = init3;
 		}
@@ -518,10 +726,14 @@ int ballmovements_Tick(int state){
 			//need any condition?
 			//
 			//initial starting condition:
-			ballpattern = 0x02;
-			ballrow = 0xef;
+		//	ballpattern = 0x02;
+		//	ballrow = 0xef;
 			//ball is starting in middle at default paddle
 			//position on enemy side
+			
+			ballpattern = 0x40;
+			ballrow = 0xdf;
+			
 			break;
 		case init3:
 			temp_ballpattern = ballpattern;
@@ -545,7 +757,7 @@ int ballmovements_Tick(int state){
 			}
 			else if(temp_ballpattern == 0x02){
 				ballpattern = ballpattern << 1;
-				ballrow = (ballrow >> 1) | 0x01;
+				ballrow = (ballrow << 1) | 0x01;
 			}
 			//any more conditions?
 			break;
