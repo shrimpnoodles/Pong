@@ -15,8 +15,8 @@
 #include "simAVRHeader.h"
 #endif
 
-unsigned char pattern = 0x80;
-unsigned char row = 0xFE;
+//unsigned char pattern = 0x80;
+//unsigned char row = 0xFE;
 
 void Set_A2D_Pin(unsigned char pinNum) {
 	ADMUX = (pinNum <= 0x07) ? pinNum : ADMUX;
@@ -518,10 +518,14 @@ int ballmovements_Tick(int state){
 			//need any condition?
 			//
 			//initial starting condition:
-			ballpattern = 0x02;
-			ballrow = 0xef;
+		//	ballpattern = 0x02;
+		//	ballrow = 0xef;
 			//ball is starting in middle at default paddle
 			//position on enemy side
+			
+			ballpattern = 0x40;
+			ballrow = 0xdf;
+			
 			break;
 		case init3:
 			temp_ballpattern = ballpattern;
@@ -545,7 +549,7 @@ int ballmovements_Tick(int state){
 			}
 			else if(temp_ballpattern == 0x02){
 				ballpattern = ballpattern << 1;
-				ballrow = (ballrow >> 1) | 0x01;
+				ballrow = (ballrow << 1) | 0x01;
 			}
 			//any more conditions?
 			break;
