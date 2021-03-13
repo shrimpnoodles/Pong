@@ -555,7 +555,7 @@ int enemypaddle_Tick(int state){
 			sensor =1;
 			break;
 		case waitenemy:
-			if(temp_ballpattern ==0x02){
+			if(temp_ballpattern >0x02){
 				sensor =0;
 			}
 			break;
