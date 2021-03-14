@@ -161,7 +161,10 @@ int userpaddle_Tick(int state){
 
 //skeleton of enemy paddle
 //
+<<<<<<< HEAD
 
+=======
+>>>>>>> 00825607d000787372e7325fa5fbc64db3a4aeaa
 enum enemypaddle_States{waittostart, start2, init2, pos1, pos2, pos3, pos4, pos5, pos6, waitenemy };
 
 int enemypaddle_Tick(int state){
@@ -236,8 +239,11 @@ int enemypaddle_Tick(int state){
 	}
 	switch(state){
 		case waittostart:
+<<<<<<< HEAD
 			enemyrow = 0xFF;
 			enemypattern = 0x00;
+=======
+>>>>>>> 00825607d000787372e7325fa5fbc64db3a4aeaa
 			break;
 		case start2:
 			//p2 condition?
@@ -466,6 +472,12 @@ int enemypaddle_Tick(int state){
 			
 			break;
 		case waitenemy:
+<<<<<<< HEAD
+=======
+			if(temp_ballpattern >0x02){
+				sensor =0;
+			}
+>>>>>>> 00825607d000787372e7325fa5fbc64db3a4aeaa
 			break;
 		default:
 			break;
@@ -920,8 +932,13 @@ int main(void) {
 
     /* Insert your solution below */
     while (1) {
+<<<<<<< HEAD
     	button = ~PINB;
 
+=======
+   	 button = ~PINA & 0x1c;
+    
+>>>>>>> 00825607d000787372e7325fa5fbc64db3a4aeaa
 	for(i=0; i<numTasks; i++){
 		if(tasks[i]->elapsedTime == tasks[i]->period){
 			tasks[i]->state = tasks[i]->TickFct(tasks[i]->state);
