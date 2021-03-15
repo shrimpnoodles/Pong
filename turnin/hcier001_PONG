@@ -55,6 +55,8 @@ unsigned char temp_ballpattern;
 unsigned char ballpattern;
 unsigned char ballrow;
 
+unsigned char ballspeedcount;
+
 unsigned char button; //p2, reset... ~PINA
 
 unsigned char p2paddle;
@@ -500,7 +502,7 @@ int enemypaddle_Tick(int state){
 }
 
 
-enum ballmovements_States{start3, init3, ballup, ballcenter, balldown, ballup2, ballcenter2, balldown2, nohit, nohit2};
+enum ballmovements_States{start3, init3, ballup, ballcenter, ballcenterWAIT, balldown, ballup2, ballcenter2, ballcenterWAIT2, balldown2, nohit, nohit2};
 
 int ballmovements_Tick(int state){
 	switch(state){
@@ -661,6 +663,14 @@ int ballmovements_Tick(int state){
 		if(ballpattern == 0x02){
 			state = init3;
 		}
+		else{
+			state = ballcenterWAIT;
+		}
+		break;
+	case ballcenterWAIT:
+		if(ballspeedcount ==0||ballpattern == 0x02){
+			state = ballcenter;
+		}
 		break;
 	case ballup2:
 		if(ballrow == 0xfe && ballpattern != 0x40){
@@ -682,6 +692,14 @@ int ballmovements_Tick(int state){
 		if(ballpattern == 0x40){
 			state = init3;
 		}
+		else{
+			state = ballcenterWAIT2;
+		}
+		break;
+	case ballcenterWAIT2:
+		if(ballspeedcount==0 || ballpattern == 0x40){
+			state = ballcenter2;
+		}
 		break;
 	case nohit:
 		state = start3;
@@ -702,7 +720,8 @@ int ballmovements_Tick(int state){
 		//	ballrow = 0xef;
 			//ball is starting in middle at default paddle
 			//position on enemy side
-			
+			ballspeedcount = 2;
+				
 			ballpattern = 0x40;
 		//	ballrow = 0x7f;
 			ballrow = 0xef;
@@ -735,6 +754,7 @@ int ballmovements_Tick(int state){
 			//any more conditions?
 			break;
 		case ballcenter:
+			ballspeedcount =2;
 		//	if(temp_ballpattern == 0x40){
 				ballpattern = ballpattern >>1;
 		//	}
@@ -742,6 +762,9 @@ int ballmovements_Tick(int state){
 		//		ballpattern = ballpattern << 1;
 		//	}
 			//any more conditions?
+			break;
+		case ballcenterWAIT:
+			ballspeedcount--;
 			break;
 		case ballup2:
 			ballpattern = ballpattern <<1;
@@ -752,7 +775,11 @@ int ballmovements_Tick(int state){
 			ballrow = (ballrow << 1) | 0x01;
 			break;
 		case ballcenter2:
+			ballspeedcount =2;
 			ballpattern = ballpattern <<1;
+			break;
+		case ballcenterWAIT2:
+			ballspeedcount--;
 			break;
 		case nohit:
 			score++;
@@ -1008,9 +1035,9 @@ int outputled_Tick(int state){
 			enemyrow = 0xc7;
 
 			p2row = 0xc7;
-			p2on = 0;
+	//		p2on = 0;
 
-			ballpattern = 0x80;
+			ballpattern = 0x40;
 			ballrow = 0xef;
 
 			introcount = 7000;
